@@ -17,41 +17,35 @@ const categorias = [
     ]
   },
 
-
-{
-  area: "PESSOAL",
-  tipo: "RECEITA",
-  categoria: "Renda Extra",
-  palavras: [
-    "extra",
-    "freela",
-    "freelancer",
-    "freela",
-    "pix",
-    "venda",
-    "vendi",
-    "cliente",
-    "serviço",
-    "servico",
-    "bico",
-    "comissão",
-    "comissao",
-    "comissão",
-    "comissao",
-    "lucro",
-    "ganhei",
-    "recebi",
-    "renda",
-    "trabalho extra",
-    "show"
-  ]
-}
-
+  {
+    area: "PESSOAL",
+    tipo: "RECEITA",
+    categoria: "Renda Extra",
+    palavras: [
+      "extra",
+      "freela",
+      "freelancer",
+      "pix",
+      "venda",
+      "vendi",
+      "cliente",
+      "serviço",
+      "servico",
+      "bico",
+      "comissão",
+      "comissao",
+      "lucro",
+      "ganhei",
+      "recebi",
+      "renda",
+      "trabalho extra",
+      "show"
+    ]
+  },
 
   // ======================
   // DESPESAS PESSOAL
   // ======================
-
 
   {
     area: "PESSOAL",
@@ -75,7 +69,6 @@ const categorias = [
     ]
   },
 
-
   {
     area: "PESSOAL",
     tipo: "DESPESA",
@@ -95,7 +88,6 @@ const categorias = [
     ]
   },
 
-
   {
     area: "PESSOAL",
     tipo: "DESPESA",
@@ -109,7 +101,6 @@ const categorias = [
       "passeio"
     ]
   },
-
 
   {
     area: "PESSOAL",
@@ -130,48 +121,29 @@ const categorias = [
 
 ];
 
-
-
 function detectarCategoria(area, tipo, descricao) {
-
 
   const texto = descricao.toLowerCase();
 
-
-
   for (const item of categorias) {
 
-
     if (item.area !== area) continue;
-
-
     if (item.tipo !== tipo) continue;
-
-
 
     for (const palavra of item.palavras) {
 
-
       if (texto.includes(palavra)) {
-
         return item.categoria;
-
       }
 
     }
 
   }
 
-
-
   return "Outros";
 
 }
 
-
-
 module.exports = {
-
   detectarCategoria
-
 };
