@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+enum Area {
+  PESSOAL
+  CASA
+}
+
+
+enum Tipo {
+  RECEITA
+  DESPESA
+}
+
+
+model User {
+
+  id               Int      @id @default(autoincrement())
+
+  telegramId       String   @unique
+
+  nome             String
+
+  // Saldo disponível atualmente
+  saldo            Float    @default(0)
+
+  // Renda mensal fixa
+  salarioMensal    Float?
+
+  areaSelecionada  Area?
+
+  createdAt        DateTime @default(now())
+
+
+  transactions     Transaction[]
+
+  userCategories   UserCategory[]
+
+}
+
+
+
+model Category {
+
+  id     Int    @id @default(autoincrement())
+
+  nome   String
+
+  icone  String
+
+  area   Area
+
+  tipo   Tipo
+
+
+  transactions Transaction[]
+
+  usuarios     UserCategory[]
+
+
+  @@unique([nome, area], name: "nome_area")
+
+}
+
+
+
+model UserCategory {
+
+  id         Int @id @default(autoincrement())
+
+
+  userId     Int
+
+  categoryId Int
+
+
+  ativa      Boolean @default(true)
+
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+
+  @@unique([userId, categoryId])
+
+}
+
+
+
+model Transaction {
+
+  id          Int      @id @default(autoincrement())
+
+
+  area        Area
+
+  tipo        Tipo
+
+
+  descricao   String
+
+  valor       Float
+
+
+  data        DateTime @default(now())
+
+
+  recorrente  Boolean @default(false)
+
+
+  userId      Int
+
+  user        User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+
+  categoryId  Int
+
+  category    Category @relation(fields: [categoryId], references: [id])
+
+
+  @@index([userId])
+
+  @@index([data])
+
+  @@index([area])
+
+}
