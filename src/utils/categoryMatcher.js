@@ -18,20 +18,34 @@ const categorias = [
   },
 
 
-  {
-    area: "PESSOAL",
-    tipo: "RECEITA",
-    categoria: "Renda Extra",
-    palavras: [
-      "show",
-      "freela",
-      "freelancer",
-      "extra",
-      "venda",
-      "bico",
-      "trabalho extra"
-    ]
-  },
+{
+  area: "PESSOAL",
+  tipo: "RECEITA",
+  categoria: "Renda Extra",
+  palavras: [
+    "extra",
+    "freela",
+    "freelancer",
+    "freela",
+    "pix",
+    "venda",
+    "vendi",
+    "cliente",
+    "serviço",
+    "servico",
+    "bico",
+    "comissão",
+    "comissao",
+    "comissão",
+    "comissao",
+    "lucro",
+    "ganhei",
+    "recebi",
+    "renda",
+    "trabalho extra",
+    "show"
+  ]
+}
 
 
   // ======================
