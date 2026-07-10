@@ -103,17 +103,18 @@ Solicite um convite ao administrador.`
 
     }
 
-    const resultado = liberarPorConvite(
-      codigo,
-      telegramId
-    );
+const resultado = liberarPorConvite(
+  telegramId,
+  codigo
+);
 
-    if (!resultado.success) {
+ if (!resultado) {
 
-      return ctx.reply(resultado.message);
+  return ctx.reply(
+`❌ Convite inválido ou já utilizado.`
+  );
 
-    }
-
+}
     await createUser(
       telegramId,
       nome

@@ -38,34 +38,37 @@ function liberarPorConvite(telegramId, codigo) {
   const id = String(telegramId);
 
 
-  if (!CONVITES[codigo]) {
-
-    if (CONVITES[codigo] === null) {
-
-      const expiraEm = new Date(
-        Date.now() + ACCESS_DURATION
-      );
-
-
-      usuariosAutorizados[id] = {
-        expiraEm
-      };
-
-
-      CONVITES[codigo] = id;
-
-
-      return true;
-
-    }
-
+  // Verifica se o convite existe
+  if (!(codigo in CONVITES)) {
+    return false;
   }
 
 
-  return false;
+  // Verifica se o convite já foi usado
+  if (CONVITES[codigo] !== null) {
+    return false;
+  }
+
+
+  // Define validade de 12 horas
+  const expiraEm = new Date(
+    Date.now() + ACCESS_DURATION
+  );
+
+
+  // Salva usuário autorizado
+  usuariosAutorizados[id] = {
+    expiraEm
+  };
+
+
+  // Marca convite como usado
+  CONVITES[codigo] = id;
+
+
+  return true;
 
 }
-
 
 
 module.exports = {
