@@ -11,6 +11,14 @@ const {
   resetUser
 } = require("./services/userService");
 
+const {
+  isAdmin,
+  possuiAcesso,
+  liberarPorConvite
+} = require("./services/accessService");
+
+const checkAccess = require("./middleware/checkAccess");
+
 
 const {
   setState,
@@ -42,100 +50,96 @@ bot.start(async (ctx) => {
     const telegramId = String(ctx.from.id);
     const nome = ctx.from.first_name;
 
+    // ADMIN
+    if (isAdmin(telegramId)) {
+
+      await createUser(telegramId, nome);
+
+      return ctx.reply(
+`👑 Bem-vindo Administrador!
+
+Você possui acesso ilimitado.
+
+Escolha uma área para começar:`,
+        Markup.keyboard([
+          ["👤 Pessoal"],
+          ["🏠 Casa"]
+        ]).resize()
+      );
+
+    }
+
+    // USUÁRIO JÁ LIBERADO
+    if (possuiAcesso(telegramId)) {
+
+      await createUser(telegramId, nome);
+
+      return ctx.reply(
+`👋 Bem-vindo novamente!
+
+Escolha uma área:`,
+        Markup.keyboard([
+          ["👤 Pessoal"],
+          ["🏠 Casa"]
+        ]).resize()
+      );
+
+    }
+
+    // LÊ O CÓDIGO DO CONVITE
+    const texto = ctx.message.text;
+
+    const partes = texto.split(" ");
+
+    const codigo = partes[1];
+
+    if (!codigo) {
+
+      return ctx.reply(
+`🔒 Você não possui acesso ao FinanceMoney AI.
+
+Solicite um convite ao administrador.`
+      );
+
+    }
+
+    const resultado = liberarPorConvite(
+      codigo,
+      telegramId
+    );
+
+    if (!resultado.success) {
+
+      return ctx.reply(resultado.message);
+
+    }
 
     await createUser(
       telegramId,
       nome
     );
 
+    return ctx.reply(
+`🎉 Convite aceito!
 
- await ctx.reply(
-`🤖 Olá ${nome}! Bem-vindo ao FinanceMoney AI.
+Seu acesso é válido por 12 horas.
 
-
-💰 Eu sou seu assistente financeiro inteligente.
-
-Minha função é ajudar você a organizar sua vida financeira, registrando:
-
-✅ Receitas
-✅ Despesas
-✅ Controle de saldo
-✅ Relatórios financeiros
-✅ Análises dos seus gastos
-
-
-Você poderá acompanhar tudo de forma simples diretamente pelo Telegram.
-
-
-📌 Digite /ajuda para ver todos os comandos disponíveis da IA.
-
-
-Agora vamos começar!
-
-
-Escolha qual área você quer controlar:`,
+Escolha a área desejada:`,
       Markup.keyboard([
         ["👤 Pessoal"],
         ["🏠 Casa"]
-      ])
-      .resize()
+      ]).resize()
     );
 
-
-  } catch(error){
+  } catch (error) {
 
     console.error(error);
 
-    await ctx.reply(
-      "Erro ao iniciar cadastro."
-    );
+    ctx.reply("Erro ao iniciar.");
 
   }
 
 });
-
-
-
-//
-// ÁREA PESSOAL
-//
-
-bot.hears("👤 Pessoal", async(ctx)=>{
-
-
-  const telegramId = String(ctx.from.id);
-
-
-  await updateUserArea(
-    telegramId,
-    "PESSOAL"
-  );
-
-
-  setState(
-    telegramId,
-    {
-      etapa:"SALARIO"
-    }
-  );
-
-
-  await ctx.reply(
-`👤 Controle pessoal ativado!
-
-Antes de começar:
-
-💰 Qual é o seu salário mensal?
-
-Exemplo:
-
-3000`,
-    Markup.removeKeyboard()
-  );
-
-
-});
-
 
 
 //
@@ -237,7 +241,7 @@ O FinanceMoney AI identifica automaticamente as categorias.
 // CONSULTAR SALDO
 //
 
-bot.command("saldo", async (ctx) => {
+bot.command("saldo", checkAccess, async (ctx) => {
 
   try {
 
@@ -304,7 +308,7 @@ ${new Date().toLocaleString("pt-BR")}
 // RESETAR CONTA
 //
 
-bot.command("reset", async(ctx)=>{
+bot.command("reset", checkAccess, async (ctx) => {
 
   const telegramId = String(ctx.from.id);
 
@@ -345,7 +349,7 @@ para continuar.`
 // RELATÓRIO PESSOAL
 //
 
-bot.command("relatorio", async (ctx) => {
+bot.command("relatorio", checkAccess, async (ctx) => {
 
   
 
@@ -454,7 +458,7 @@ Fique atento aos próximos gastos.`;
 // TODAS AS MENSAGENS
 //
 
-bot.on("text", async(ctx)=>{
+bot.on("text", checkAccess, async (ctx) => {
 
 
   const texto = ctx.message.text;
@@ -738,3 +742,8 @@ bot.launch();
 console.log(
 "🤖 FinanceMoney AI iniciado!"
 );
+
+
+
+
+
